@@ -3111,7 +3111,6 @@ class class_wpp_property_import {
 
     //** Set schedule ID */
     $schedule_id = $data[ 'schedule_id' ];
-
     // Detect protocol.
     if( strpos( $url, 'ftp://' ) === 0 ) {
       $_protocol = 'ftp';
@@ -3133,7 +3132,7 @@ class class_wpp_property_import {
     }
 
     $newvars = array();
-
+    
     // Google Spreadsheet Importing
     if( $data[ 'wpp_property_import' ][ 'source_type' ] == 'gs' ) {
 
@@ -3144,7 +3143,6 @@ class class_wpp_property_import {
           $gdata = new gc_import();
           /* Build our query */
           $query = new Zend_Gdata_Spreadsheets_ListQuery();
-
           if( $data[ 'wpp_property_import' ][ 'spreadsheet_key' ] ) {
             $query->setSpreadsheetKey( $data[ 'wpp_property_import' ][ 'spreadsheet_key' ]  );
           } else {
@@ -3251,7 +3249,7 @@ class class_wpp_property_import {
       try {
 
         $import = $data[ 'wpp_property_import' ];
-
+        
         /** Get my rets object */
         $rets = class_wpp_property_import::connect_rets( $import );
 
@@ -3355,7 +3353,8 @@ class class_wpp_property_import {
             }
           }
         }
-
+        
+        
         // $limit = 20;
         /** Search for Properties */
         $search = $rets->SearchQuery( $resource, $import[ 'rets_class' ], $rets_query, array( 'Limit' => $limit ) );
@@ -3410,6 +3409,7 @@ class class_wpp_property_import {
           class_wpp_property_import::maybe_echo_log( sprintf( __( 'Image directory %1s could not be created.', ud_get_wpp_importer()->domain ), $image_directory ) );
         }
 
+        
         while( $row = $rets->FetchRow( $search ) ) {
           class_wpp_property_import::keep_hope_alive();
           $processed_properties[ $row[ $rets_pk ] ] = true;

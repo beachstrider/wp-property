@@ -64,8 +64,8 @@ if( !class_exists( 'phRETS' ) ) {
     private $session_id;
     private $catch_last_response = false;
     private $disable_encoding_fix = false;
-    private $offset_support = false;
-    private $override_offset_protection = false;
+    private $offset_support = true;
+    private $override_offset_protection = true;
 
     // @modified - potanin@UD
     private $use_post_method = false;
@@ -525,7 +525,12 @@ if( !class_exists( 'phRETS' ) ) {
       $search_arguments[ 'Count' ]  = ( !array_key_exists( 'Count', $optional_params ) ) ? 1 : $optional_params[ 'Count' ];
       $search_arguments[ 'Format' ] = empty( $optional_params[ 'Format' ] ) ? "COMPACT-DECODED" : $optional_params[ 'Format' ];
       $search_arguments[ 'Limit' ]  = empty( $optional_params[ 'Limit' ] ) ? 99999999 : $optional_params[ 'Limit' ];
-
+      $search_arguments[ 'totalLimit' ] = intval($search_arguments['Limit']);
+      
+      if($search_arguments[ 'Limit' ] > 1500){
+        $search_arguments[ 'Limit' ] = 1500;
+      }
+      
       if( isset( $optional_params[ 'Offset' ] ) ) {
         $search_arguments[ 'Offset' ] = $optional_params[ 'Offset' ];
       } elseif( $this->offset_support && empty( $optional_params[ 'Offset' ] ) ) {
@@ -544,8 +549,9 @@ if( !class_exists( 'phRETS' ) ) {
       $search_arguments[ 'StandardNames' ] = empty( $optional_params[ 'StandardNames' ] ) ? 0 : $optional_params[ 'StandardNames' ];
 
       $continue_searching = true; // Keep searching if MAX ROWS is reached and offset_support is true
-      while( $continue_searching ) {
 
+
+      while( $continue_searching ) {
         $this->search_data[ $this->int_result_pointer ][ 'maxrows_reached' ] = false;
         $this->search_data[ $this->int_result_pointer ][ 'search_requests' ]++;
 
@@ -562,9 +568,11 @@ if( !class_exists( 'phRETS' ) ) {
 
         // make request
         $result = $this->RETSRequest( $this->capability_url[ 'Search' ], $search_arguments );
+
         if( !$result ) {
           return false;
         }
+
         list( $headers, $body ) = $result;
 
         $body = $this->fix_encoding( $body );
@@ -625,8 +633,11 @@ if( !class_exists( 'phRETS' ) ) {
         } else {
           $continue_searching = false;
         }
-      }
 
+        if($search_arguments[ 'Offset' ] > $search_arguments[ 'totalLimit' ]){
+          $continue_searching = false;
+        }
+      }
       return $this->int_result_pointer;
     }
 
