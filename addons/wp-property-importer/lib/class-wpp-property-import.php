@@ -1920,7 +1920,7 @@ class class_wpp_property_import {
             $xml_data = $response[ 'body' ];
           }
         }
-
+       
         self::maybe_echo_memory_usage( __( 'before XML object initialization from response (string)', ud_get_wpp_importer()->domain ), $schedule_id );
         //* Remove namespaces since there is little support for them */
         $xml_data = str_replace( 'xmlns=', 'nothing=', $xml_data );
@@ -2026,7 +2026,7 @@ class class_wpp_property_import {
         }
 
         unset( $xml );
-
+        
         //** Load schedule data from DB, if it isn't already loaded, such as by a preview. */
         if( !$schedule_settings ) {
           $schedule_settings = $wp_properties[ 'configuration' ][ 'feature_settings' ][ 'property_import' ][ 'schedules' ][ $schedule_id ];
@@ -2252,7 +2252,7 @@ class class_wpp_property_import {
             break;
           }
         } //** end $objects loop */
-
+        
         unset( $objects );
         self::maybe_echo_memory_usage( __( 'after parsing the list of XML objects (listings)', ud_get_wpp_importer()->domain ), $schedule_id );
 
@@ -2823,6 +2823,7 @@ class class_wpp_property_import {
 
     //** Keep track of all attributes that have values and have been imported */
     $processed_attributes = array();
+    
     
     //** Cycle through attributes ( which include meta value, images and taxonomies ) */
     foreach( $data as $attribute => $values ) {
@@ -3399,16 +3400,16 @@ class class_wpp_property_import {
         $processed_properties = array();
 
         $row_count = 1;
-
+        
         //** Create a temp directory using the import ID as name */
         $image_directory = class_wpp_property_import::create_import_directory( array( 'ad_hoc_temp_dir' => $schedule_id ) );
-
+        
         if( $image_directory ) {
           $image_directory = $image_directory[ 'ad_hoc_temp_dir' ];
         } else {
           class_wpp_property_import::maybe_echo_log( sprintf( __( 'Image directory %1s could not be created.', ud_get_wpp_importer()->domain ), $image_directory ) );
         }
-
+        
         
         while( $row = $rets->FetchRow( $search ) ) {
           class_wpp_property_import::keep_hope_alive();
@@ -3419,7 +3420,7 @@ class class_wpp_property_import {
           ) );
           $row_count++;
         }
-        /** End of RETS $search cycle */
+          /** End of RETS $search cycle */
 
         if( is_array( $processed_properties ) ) {
           $processed_properties = count( $processed_properties );

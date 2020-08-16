@@ -526,11 +526,13 @@ if( !class_exists( 'phRETS' ) ) {
       $search_arguments[ 'Format' ] = empty( $optional_params[ 'Format' ] ) ? "COMPACT-DECODED" : $optional_params[ 'Format' ];
       $search_arguments[ 'Limit' ]  = empty( $optional_params[ 'Limit' ] ) ? 99999999 : $optional_params[ 'Limit' ];
       $search_arguments[ 'totalLimit' ] = intval($search_arguments['Limit']);
+
+      $remainFeedAmount = $search_arguments[ 'totalLimit' ];
       
       if($search_arguments[ 'Limit' ] > 1500){
         $search_arguments[ 'Limit' ] = 1500;
       }
-      
+
       if( isset( $optional_params[ 'Offset' ] ) ) {
         $search_arguments[ 'Offset' ] = $optional_params[ 'Offset' ];
       } elseif( $this->offset_support && empty( $optional_params[ 'Offset' ] ) ) {
@@ -550,7 +552,6 @@ if( !class_exists( 'phRETS' ) ) {
 
       $continue_searching = true; // Keep searching if MAX ROWS is reached and offset_support is true
 
-
       while( $continue_searching ) {
         $this->search_data[ $this->int_result_pointer ][ 'maxrows_reached' ] = false;
         $this->search_data[ $this->int_result_pointer ][ 'search_requests' ]++;
@@ -565,9 +566,14 @@ if( !class_exists( 'phRETS' ) ) {
           return false;
         }
 
+        if($remainFeedAmount < $search_arguments[ 'Limit' ]){
+          $search_arguments[ 'Limit' ] = $remainFeedAmount;
+        }
 
         // make request
         $result = $this->RETSRequest( $this->capability_url[ 'Search' ], $search_arguments );
+
+        $remainFeedAmount -= $search_arguments[ 'Limit' ];
 
         if( !$result ) {
           return false;
@@ -634,10 +640,11 @@ if( !class_exists( 'phRETS' ) ) {
           $continue_searching = false;
         }
 
-        if($search_arguments[ 'Offset' ] > $search_arguments[ 'totalLimit' ]){
+        if($remainFeedAmount < 1){
           $continue_searching = false;
         }
       }
+
       return $this->int_result_pointer;
     }
 
